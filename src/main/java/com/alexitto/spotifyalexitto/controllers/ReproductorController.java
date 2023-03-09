@@ -50,7 +50,7 @@ public class ReproductorController implements Initializable {
 
     private Status status = Status.PAUSE;
 
-    private int indice = 1;
+    private int indice = 0;
 
 
     @Override
@@ -60,9 +60,13 @@ public class ReproductorController implements Initializable {
     }
 
 
-    private void ConfigSong(URL url) {
+    public void ConfigSong(URL url) {
         Media media = new Media(url.toExternalForm());
 
+        if (media.getMetadata().isEmpty()) {
+            setMetaData("title", "unknown");
+            setMetaData("unknown", null);
+        }
 
         media.getMetadata().addListener((MapChangeListener<String, Object>) ch -> {
             if (ch.wasAdded()) {
@@ -90,14 +94,25 @@ public class ReproductorController implements Initializable {
         if (k.equals("image")){
             imagenCancion.setImage((Image) v);
         }
+        if (k.equals("unknown"))
+        {
+            author.setText("unknown");
+            playlist.setText("");
+            imagenCancion.setImage(new Image(Objects.requireNonNull(ReproductorController.class.getResource("/com/alexitto/spotifyalexitto/images/music-logo-design.png")).toString()));
+        }
     }
 
     private void configSlider(Media media) {
         barra.setOnMousePressed(event -> {
             double pos = barra.getValue();
-            double totalDuration = mediaPlayer.getTotalDuration().toSeconds();
+            double totalDuration = media.getDuration().toSeconds();
             double time = (pos * totalDuration) / 100;
             mediaPlayer.seek(Duration.seconds(time));
+        });
+
+        mediaPlayer.currentTimeProperty().addListener((obs, oldVal, newVal) -> {
+            double totalDuration = mediaPlayer.getMedia().getDuration().toSeconds();
+            barra.setValue((newVal.toSeconds() * 100)/totalDuration);
         });
     }
 
@@ -116,7 +131,6 @@ public class ReproductorController implements Initializable {
         if (status == Status.PLAYING) {
             mediaPlayer.pause();
             status = Status.PAUSE;
-            System.out.println("hola");
 
         } else if (status == Status.PAUSE) {
             mediaPlayer.play();
@@ -129,10 +143,10 @@ public class ReproductorController implements Initializable {
     @FXML
     public void forward(){
         mediaPlayer.stop();
-        indice=(indice+1);
-        if (indice>1) {
-            loadSong();
-        }
+        if (indice == listcanciones.size() - 1)
+            indice = 0;
+        else
+            indice=(indice+1);
         ConfigSong(Objects.requireNonNull(getClass().getResource("/com/alexitto/spotifyalexitto/media/" + listcanciones.get(indice))));
         mediaPlayer.play();
 
@@ -141,19 +155,19 @@ public class ReproductorController implements Initializable {
     @FXML
     public void backward(){
         mediaPlayer.stop();
-        indice=(indice-1);
-        if(indice==0){
-            indice++;
-        }
-        if (indice<1) {
-            loadSong();
-        }
+        if(indice==0)
+            indice = listcanciones.size() - 1;
+        else
+            indice=indice-1;
         ConfigSong(Objects.requireNonNull(getClass().getResource("/com/alexitto/spotifyalexitto/media/" + listcanciones.get(indice))));
         mediaPlayer.play();
 
     }
 
-
+    public Status getMediaPlayerStatus()
+    {
+        return status;
+    }
 
 
 }

@@ -6,12 +6,16 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("reproductor.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 420, 340);
+        Locale es = new Locale("es", "ES");
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n/strings", es);
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("main_view.fxml"), resourceBundle);
+        Scene scene = new Scene(fxmlLoader.load(), 550, 400);
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.show();
