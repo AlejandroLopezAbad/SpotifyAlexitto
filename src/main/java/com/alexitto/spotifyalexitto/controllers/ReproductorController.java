@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
@@ -26,6 +27,8 @@ import java.util.ResourceBundle;
 
 
 public class ReproductorController implements Initializable {
+    @FXML
+    private ImageView imagenCancion;
     @FXML
     private Label cancion;
     @FXML
@@ -83,6 +86,9 @@ public class ReproductorController implements Initializable {
         }
         if (k.equals("album")) {
             playlist.setText(v.toString());
+        }
+        if (k.equals("image")){
+            imagenCancion.setImage((Image) v);
         }
     }
 
